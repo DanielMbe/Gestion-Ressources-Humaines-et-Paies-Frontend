@@ -2,16 +2,30 @@ import { useState } from "react"
 import { Api } from "/src/serveur/ApiConnector"
 
 function ajouterEmployer({listEmploye, setListEmploye}) {
-    let lname=document.getElementById("ajoutNom").value;
-    let fname=document.getElementById("ajoutPrenom").value;
-    let mail=document.getElementById("ajoutEmail").value;
-    let job=document.getElementById("ajoutPoste").value;
-    let dept=document.getElementById("ajoutDept").value;
-    let earn=document.getElementById("ajoutSalaire").value;
-    let admin = localStorage.getItem("loginID");
+    let nom=document.getElementById("ajoutNom").value;
+    let prenom=document.getElementById("ajoutPrenom").value;
+    let email=document.getElementById("ajoutEmail").value;
+    let poste=document.getElementById("ajoutPoste").value;
+    let departement=document.getElementById("ajoutDept").value;
+    let salaire=Number(parseFloat(document.getElementById("ajoutSalaire").value).toFixed(2));
+    let success = false;
 
-    Api.post("ajout/", {lname, fname, mail, job, dept, earn, admin})
-    .then(response => {setListEmploye([...listEmploye, response.data]);}).catch(error => console.error(error));
+    Api.post("employes/ajout/", {nom, prenom, email, poste, departement, salaire })
+    .then(response => {
+        setListEmploye([...listEmploye, response.data]);
+        Api.post("conges/creerconge/", {email}).then(() => {
+            Api.post("paies/creerpaie/", {email});
+        });
+    }).catch(error => console.error(error));
+
+    if (success == true) {
+        success = false;
+        Api.post("conges/creerconge/", {email}).then(() => {success = true;}).catch(error => console.error(error));
+    }
+
+    if (success == true) {
+        Api.post("paies/creerpaie/", {email}).then(() => {success = true;}).catch(error => console.error(error));
+    }
 }
 
 export function RhStaffUI({listEmploye, setListEmploye}) {
@@ -23,15 +37,16 @@ export function RhStaffUI({listEmploye, setListEmploye}) {
     const [staffSelectioner, setStaffSelectioner] = useState(null);
     const ouvrirModifier = (employe) => {setEstModifier(true); setStaffSelectioner(employe);}
     const fermerModifier = () => setEstModifier(false);
-    const validerModifier = async (cleId) => {
+    const validerModifier = async (email) => {
         if (estModifier) {
             for(const employe of listEmploye) {
-                if (cleId == employe.id) {
-                    let mail = employe.email;
-                    let job = employe.poste;
-                    let dept = employe.departement;
-                    let earn = employe.salaire;
-                    Api.post("modifier/", {cleId, mail, job, dept, earn}).then(fermerModifier()).catch(error => console.error(error));
+                if (email == employe.email) {
+                    let email = employe.email;
+                    let poste = employe.poste;
+                    let departement = employe.departement;
+                    let salaire = Number(parseFloat(employe.salaire).toFixed(2));
+                    Api.put("employes/modifier/", {email, poste, departement, salaire})
+                    .then(fermerModifier()).catch(error => console.error(error));
                     break;
                 }
             }
@@ -77,7 +92,7 @@ export function RhStaffUI({listEmploye, setListEmploye}) {
             <div className="h-full w-full flex flex-col px-2">
                 {listEmploye.map((staff) => {
                     return (
-                        <div className="flex justify-center items-center w-full">
+                        <div className="flex justify-center items-center w-full" key={staff.email}>
                             <div className="flex justify-around items-center h-14 w-full max-w-250 bg-gray-100 rounded-xl my-2 px-2">
                                 <div className="w-1/5">{staff.nom}</div>
                                 <div className="w-1/4">{staff.prenom}</div>
@@ -121,7 +136,7 @@ export function RhStaffUI({listEmploye, setListEmploye}) {
                             <button className="h-11 w-30 bg-white border-2 border-blue-300 rounded-xl hover:bg-blue-100 transition-background duration-400 ease-in-out mx-2"
                             onClick={() => fermerModifier()}>Annuler</button>
                             <button className="h-11 w-30 text-white bg-blue-500 rounded-xl hover:bg-blue-700 transition-background duration-400 ease-in-out mx-2"
-                            onClick={() => validerModifier(staffSelectioner.id)}>Modifier</button>
+                            onClick={() => validerModifier(staffSelectioner.email)}>Modifier</button>
                         </div>
                     </div>
                 </div>

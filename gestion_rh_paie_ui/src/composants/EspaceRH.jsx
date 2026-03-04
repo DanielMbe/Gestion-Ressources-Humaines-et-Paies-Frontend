@@ -9,8 +9,7 @@ import { RhStaffUI } from "/src/composants/RhStaffUI";
 export function EspaceRH({activeView}) {
     const [listEmploye, setListEmploye] = useState([]);
     useEffect(() => {
-        let loginID = localStorage.getItem("loginID");
-        Api.get("stafftotal/", {params : {loginID}}).then((response) => {setListEmploye(response.data);}).catch((error) => {
+        Api.get("employes/stafftotal/").then((response) => {setListEmploye(response.data);}).catch((error) => {
             console.error("Error fetching data:", error);});
     }, []); 
     

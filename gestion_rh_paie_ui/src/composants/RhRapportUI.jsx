@@ -3,7 +3,7 @@ import { Api } from "/src/serveur/ApiConnector"
 export function RhRapportUI() {
     let telechargerRapportPDF = async () => {
         let loginID = localStorage.getItem("loginID");
-        await Api.get("rapportpdf/", { params: { loginID }, responseType: "blob"}).then(response => {
+        await Api.get("employes/rapportpdf/", { params: { loginID }, responseType: "blob"}).then(response => {
             const blob = new Blob([response.data], { type: "application/pdf" });
             const url = window.URL.createObjectURL(blob);
             const link = document.createElement("a");

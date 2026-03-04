@@ -4,11 +4,11 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Api } from "/src/serveur/ApiConnector";
 
-export function BarreMenuRH({setActiveView}) {
+export function BarreMenuStaff({setActiveView}) {
     const navigate = useNavigate();
     const [activeIndex, setActiveIndex] = useState(0);
     const [prevIndex, setPrevIndex] = useState(0);
-    const buttons = ["Accueil", "Staff", "Salaire", "Congé", "Rapport"];
+    const buttons = ["Salaire", "Congé"];
     const initial = localStorage.getItem("loginID");
 
     const logout = async () => {
@@ -23,7 +23,7 @@ export function BarreMenuRH({setActiveView}) {
     return (
         <div className="bg-white h-24 w-full flex justify-around items-center px-3 border-b-1 border-gray-200 shadow-[0_4px_8px_-3px_rgb(229_231_235)]">
             <div id="nom" className="cursor-default bg-blue-500 text-white h-11 w-11 rounded-full flex justify-center items-center">{initial.substring(0,2).toUpperCase()}</div>
-            <nav className="w-130 h-full flex justify-around items-center">
+            <nav className="w-130 h-full flex justify-center items-center">
                 {buttons.map((label, index) => {
                     const bgPosition = prevIndex < activeIndex ? "left top" : "right top";
                     return(

@@ -1,10 +1,10 @@
 import { Api } from "/src/serveur/ApiConnector"
 
 export function RhCongeUI({listEmploye}) {
-    let approuverConge = async (event, id) => {
+    let approuverConge = async (event, email) => {
         for (const employe of listEmploye) {
-            if ((id == employe.id) && (employe.disponibilite.localeCompare("En demande") == 0)) {
-                await Api.post("approuverconge/", { id }).then(() => {
+            if ((email == employe.email) && (employe.disponibilite.localeCompare("En demande") == 0)) {
+                await Api.put("conges/approuverconge/", { email }).then(() => {
                     event.target.className = "flex justify-around items-center h-11 w-11 bg-gray-200 rounded-xl mx-2 transition-background duration-400 ease-in-out";
                     let buttonId = event.target.id;
                     let nextbutton = document.getElementById(buttonId.replace("1", "2"));
@@ -17,10 +17,10 @@ export function RhCongeUI({listEmploye}) {
         }
     }
 
-    let desapprouverConge = async (event, id) => {
+    let desapprouverConge = async (event, email) => {
         for (const employe of listEmploye) {
-            if ((id == employe.id) && (employe.disponibilite.localeCompare("En demande") == 0)) {
-                await Api.post("rejeterconge/", { id }).then(() => {
+            if ((email == employe.email) && (employe.disponibilite.localeCompare("En demande") == 0)) {
+                await Api.put("conges/rejeterconge/", { email }).then(() => {
                     event.target.className = "flex justify-around items-center h-11 w-11 bg-gray-200 rounded-xl mx-2 transition-background duration-400 ease-in-out";
                     let buttonId = event.target.id;
                     let nextbutton = document.getElementById(buttonId.replace("2", "1"));
@@ -40,7 +40,7 @@ export function RhCongeUI({listEmploye}) {
             <div className="h-full w-full flex flex-col px-2">
                 {listEmploye.map((staff) => {
                     return (
-                        <div className="flex justify-center items-center w-full">
+                        <div className="flex justify-center items-center w-full" key={staff.email}>
                             <div className="flex justify-around items-center h-14 w-full max-w-250 bg-gray-100 rounded-xl my-2 px-2">
                                 <div className="w-1/5">{staff.nom}</div>
                                 <div className="w-1/4">{staff.prenom}</div>
@@ -48,7 +48,7 @@ export function RhCongeUI({listEmploye}) {
                                 <div className="w-1/5" id={staff.email}>{staff.disponibilite}</div>
                             </div>
                             <button id={staff.nom+staff.prenom.split(" ").at(0)+"1"} className={`${staff.disponibilite === "En demande" ? "flex justify-around bg-blue-500 text-white items-center hover:bg-blue-700 h-11 w-11 rounded-xl mx-2 transition-background duration-400 ease-in-out" : "flex justify-around items-center h-11 w-11 bg-gray-200 rounded-xl mx-2 transition-background duration-400 ease-in-out"}`}
-                            onClick={() => approuverConge(event, staff.id)}>
+                            onClick={() => approuverConge(event, staff.email)}>
                                <svg fill="currentColor" className="w-6 h-6 text-white pointer-events-none">
                                     <path d="M5 22h-5v-12h5v12zm17.615-8.412c-.857-.115-.578-.734.031-.922.521-.16 1.354-.5 1.354-1.51 
                                     0-.672-.5-1.562-2.271-1.49-1.228.05-3.666-.198-4.979-.885.906-3.656.688-8.781-1.688-8.781-1.594 0-1.896 1.807-2.375 
@@ -58,7 +58,7 @@ export function RhCongeUI({listEmploye}) {
                                </svg> 
                             </button>
                             <button id={staff.nom+staff.prenom.split(" ").at(0)+"2"} className={`${staff.disponibilite === "En demande" ? "flex justify-around bg-red-500 text-white items-center hover:bg-red-700 h-11 w-11 rounded-xl mx-2 transition-background duration-400 ease-in-out" : "flex justify-around items-center h-11 w-11 bg-gray-200 rounded-xl mx-2 transition-background duration-400 ease-in-out"}`}
-                            onClick={() => desapprouverConge(event, staff.id)}>
+                            onClick={() => desapprouverConge(event, staff.email)}>
                                 <svg fill="currentColor" className="w-6 h-6 text-white pointer-events-none">
                                     <path d="M5 14h-5v-12h5v12zm18.875-4.809c0-.646-.555-1.32-1.688-1.41-.695-.055-.868-.623-.031-.812.701-.159 1.098-.652 1.098-1.181 
                                     0-.629-.559-1.309-1.826-1.543-.766-.141-.842-.891-.031-.953.688-.053.96-.291.96-.626-.001-.931-1.654-2.666-4.852-2.666-4.16 0-6.123 
